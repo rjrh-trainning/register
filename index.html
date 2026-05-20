@@ -159,11 +159,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // 🟢 แก้ไขข้อความคีย์ที่พิมพ์ผิดและตัวอักษรเกินให้เสถียร 100% แล้วครับ
+    // ⚙️ อัปเดตผูก Environment Variables และลิงก์ Web App API จริงของคุณแล้ว
     const CONFIG_APP = {
       SUPABASE_URL: "https://ghgmupyrkeakyolliogv.supabase.co",
-      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoZ211cHlya2Vha3lvbGxpb2d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNDE0ODksImV4cCI6MjA5NDQxNzQ4OX0.RSciT8WVeD9bwmo3DlMhw4KsdM1ftgKXka9QI9pvYzs",
-      GOOGLE_SHEET_API: "https://script.google.com/macros/s/AKfycbyX4O0PyxIkRy24iIotJn7atpAJznN7CvPAkUASoSbb9Uv7eFT_sVllTMs_SMcFlbmT/exec" 
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoZ211cHlya2Vha3lvbGxpb2d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNDE0ODksImV4cCI6MjA5NDgxNzQ4OX0.RSciT8WVeD9bwmo3DlMhw4KsdM1ftgKXka9QI9pvYzs",
+      GOOGLE_SHEET_API: "https://script.google.com/macros/s/AKfycby1Cfn0lSS6eDfCikdaXViWVUfGlv7EZOWFQzX5KQ7q6e2TsVpBp316dgSes3rvz0yf/exec" 
     };
 
     const supabaseClient = window.supabase.createClient(CONFIG_APP.SUPABASE_URL, CONFIG_APP.SUPABASE_ANON_KEY);
@@ -254,6 +254,7 @@
         if (checkError) throw checkError;
         if (currentSession.available_seats <= 0) throw new Error("ขออภัยด้วยครับ รอบการอบรมหลักสูตรนี้ที่นั่งเต็มแล้ว");
 
+        // 1. บันทึกลงตารางลูกตามโครงสร้างใหม่
         const { data: insertedData, error: insertError } = await supabaseClient
           .from('registrations')
           .insert([{ 
@@ -271,11 +272,13 @@
         if (insertError) throw insertError;
         const generatedRegId = insertedData.id; 
 
+        // 2. ตัดที่นั่งตารางหลัก
         await supabaseClient.from('sessions').update({ available_seats: currentSession.available_seats - 1 }).eq('id', sessionId);
 
         const fullSessionString = `${currentSession.name} (${currentSession.date})`;
         
-        fetch(CONFIG_APP.GOOGLE_SHEET_API, {
+        // 3. ยิงไปทำงาน Automation ฝั่ง Google Apps Script
+        await fetch(CONFIG_APP.GOOGLE_SHEET_API, {
           method: "POST",
           mode: "no-cors",
           body: new URLSearchParams({ 
@@ -298,6 +301,7 @@
       } catch (err) { 
         alert("ระบบขัดข้อง: " + err.message); 
         btn.disabled = false; 
+        btn.innerHTML = '<i class="fas fa-check-circle me-1"></i> Confirm & Register';
         validateConsentState();
       }
     }
