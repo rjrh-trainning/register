@@ -8,20 +8,20 @@
   <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
-    :root { --primary-color: #0b4c8c; --card-bg: rgba(255, 255, 255, 0.96); }
+    :root { --primary-color: #071f54; --card-bg: rgba(255, 255, 255, 0.96); }
     * { box-sizing: border-box; font-family: 'Sarabun', sans-serif !important; }
-    body { min-height: 100vh; background: linear-gradient(135deg, #f0f6fc 0%, #e1eefc 100%); color: #1f2937; }
+    body { min-height: 100vh; background: linear-gradient(135deg, #f4f8ff 0%, #eaf3ff 100%); color: #1f2937; }
     .page-shell { width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
-    .form-container { width: min(100%, 760px); background: var(--card-bg); padding: 40px; border-radius: 28px; box-shadow: 0 28px 80px rgba(11,76,140,0.12); position: relative; overflow: hidden; }
-    .form-container::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 9px; background: linear-gradient(90deg, #0b4c8c, #22c55e); }
+    .form-container { width: min(100%, 760px); background: var(--card-bg); padding: 40px; border-radius: 28px; box-shadow: 0 28px 80px rgba(7,31,84,0.15); position: relative; overflow: hidden; }
+    .form-container::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 9px; background: linear-gradient(90deg, #071f54, #1976d2); }
     .header { text-align: center; margin-bottom: 30px; }
-    .header img { max-width: 260px; height: auto; }
+    .header img { max-width: 240px; height: auto; }
     #successOverlay { display: none; position: absolute; inset: 0; background: rgba(255, 255, 255, 0.99); z-index: 100; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 36px; }
     .form-label { font-weight: 700; color: #233044; }
     .form-control, .form-select { min-height: 50px; border-radius: 14px; border: 1px solid #d7e2f2; }
-    .btn-submit { background: linear-gradient(135deg, #0b4c8c, #06315c); border: none; padding: 15px; border-radius: 999px; width: 100%; color: white; font-weight: 800; transition: 0.2s; }
+    .btn-submit { background: linear-gradient(135deg, #1976d2, #071f54); border: none; padding: 15px; border-radius: 999px; width: 100%; color: white; font-weight: 800; transition: 0.2s; }
     .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
-    .confirm-label { font-weight: 800; color: #52637a; width: 160px; display: inline-block; }
+    .confirm-label { font-weight: 800; color: #52637a; width: 150px; display: inline-block; }
   </style>
 </head>
 <body>
@@ -29,7 +29,6 @@
   <main class="page-shell">
     <div class="form-container">
       
-      <!-- หน้าจอเมื่อทำรายการสำเร็จอัตโนมัติ -->
       <div id="successOverlay">
         <div style="font-size: 80px;" class="mb-2">✅</div>
         <h2 class="text-success fw-bold mb-1">ลงทะเบียนสำเร็จ!</h2>
@@ -50,25 +49,28 @@
 
       <form id="regForm" onkeydown="return event.key != 'Enter';">
         <div class="row">
-          <div class="col-md-12 mb-3">
-            <label class="form-label">Prefix (คำนำหน้าชื่อสากล)</label>
-            <select class="form-select" id="inp_prefix" required>
-              <option value="">Select Prefix...</option>
-              <option value="Mr.">Mr. (นาย)</option>
-              <option value="Mrs.">Mrs. (นาง)</option>
-              <option value="Ms.">Ms. (นางสาว)</option>
+          <div class="col-md-4 mb-3">
+            <label class="form-label">คำนำหน้า <span class="text-muted fw-normal small">(ไม่บังคับ)</span></label>
+            <select class="form-select bg-light" id="inp_prefix" onchange="checkOther(this)">
+              <option value="" selected>ไม่ระบุ (None)</option>
+              <option value="Mr.">นาย (Mr.)</option>
+              <option value="Mrs.">นาง (Mrs.)</option>
+              <option value="Ms.">นางสาว (Ms.)</option>
+              <option value="Master">เด็กชาย (Master)</option>
+              <option value="Miss">เด็กหญิง (Miss)</option>
+              <option value="Other">อื่นๆ (โปรดระบุ)</option>
             </select>
+            <input type="text" id="other_prefix" class="form-control mt-2 border-primary" placeholder="เช่น Dr. / Prof." style="display: none;">
+          </div>
+          <div class="col-md-8 mb-3">
+            <label class="form-label">ชื่อ-นามสกุล (ภาษาไทย)</label>
+            <input type="text" class="form-control" id="inp_name_th" required placeholder="สมชาย ใจดี">
           </div>
         </div>
-
+        
         <div class="mb-3">
-          <label class="form-label">ชื่อ - นามสกุล (ภาษาไทยตามบัตรประชาชน)</label>
-          <input type="text" class="form-control" id="inp_name_th" required placeholder="สมชาย รักดี" pattern="^[ก-๙เแโใไาำะัิีึืุู֥็่้๊๋์\s]+$">
-        </div>
-
-        <div class="mb-3">
-          <label class="form-label">Full Name (ภาษาอังกฤษ ตัวพิมพ์ใหญ่เพื่อพิมพ์ใบประกาศสากล)</label>
-          <input type="text" class="form-control" id="inp_name_en" required placeholder="SOMCHAI RAKDEE" pattern="^[A-Za-z\s]+$" oninput="this.value = this.value.toUpperCase()">
+          <label class="form-label">Full Name (ภาษาอังกฤษ ตัวพิมพ์ใหญ่) <span class="text-danger small">*สำหรับใบประกาศ</span></label>
+          <input type="text" class="form-control" id="inp_name_en" required placeholder="SOMCHAI JAIDEE" pattern="[A-Za-z\s]+" oninput="this.value = this.value.toUpperCase()">
         </div>
         
         <div class="mb-3">
@@ -77,7 +79,7 @@
         </div>
         
         <div class="mb-3">
-          <label class="form-label">Email Address <span class="text-danger small">(แนะนำให้ใช้ @gmail.com)</span></label>
+          <label class="form-label">Email Address <span class="text-danger small">(แนะนำให้ใช้ @gmail.com เท่านั้น)</span></label>
           <input type="email" class="form-control" id="inp_email" required placeholder="example@gmail.com">
         </div>
         
@@ -88,8 +90,8 @@
           </select>
         </div>
         
-        <div class="border rounded-14 p-3 mb-4" style="background-color: #f0f7ff; border: 1px solid #bce0ff;">
-          <p class="margin: 0; font-size: 14px; color: #0b4c8c; line-height: 1.5; margin: 0;">
+        <div class="border rounded-12 p-3 mb-4" style="background-color: #fff9eb; border-radius: 14px; border: 1px solid #ffeeba;">
+          <p class="margin: 0; font-size: 14px; color: #92400e; line-height: 1.5; margin: 0;">
             <i class="fas fa-info-circle me-1"></i> <b>💡 ข้อแนะนำการเข้าร่วมฝึกอบรม:</b> กรุณาแต่งกายสุภาพ พร้อมฝึกปฏิบัติการ และเดินทางมาถึงก่อนเวลาเริ่มงานอย่างน้อย 15 นาที
           </p>
         </div>
@@ -99,7 +101,6 @@
     </div>
   </main>
 
-  <!-- Modal ตรวจสอบข้อมูล ควบคู่การยินยอม PDPA & Privacy Notice -->
   <div class="modal fade" id="confirmModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered modal-lg">
       <div class="modal-content" style="border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.15);">
@@ -117,7 +118,7 @@
           <h6 class="fw-bold text-primary mb-2"><i class="fas fa-shield-alt me-1"></i> 2. นโยบายคุ้มครองข้อมูลส่วนบุคคล (Privacy Notice)</h6>
           <div class="p-3 bg-light rounded-3 mb-3 small text-muted border" style="max-height: 180px; overflow-y: auto; line-height: 1.6;">
             <p class="fw-bold text-dark mb-1">ศูนย์ฝึกอบรม RJRH TRAINING CENTER ขอแจ้งรายละเอียดการประมวลผลข้อมูลส่วนบุคคลให้ท่านทราบดังนี้:</p>
-            <p><b>วัตถุประสงค์การจัดเก็บ:</b> เรามีความจำเป็นต้องจัดเก็บและใช้ข้อมูลส่วนบุคคลของท่าน เพื่อวัตถุประสงค์ในการตรวจสอบสิทธิ์ ดำเนินการจัดทำระบบคิวงาน ออกวุฒิบัตรดิจิทัล (E-Certificate) และส่งมอบข้อมูลคิวอาร์โค้ดผ่านทางอีเมลเพื่อใช้รายงานตัวเข้างานจริงตามฐานสัญญา</p>
+            <p><b>วัตถุประสงค์การจัดเก็บ:</b> เรามีความจำเป็นต้องจัดเก็บและใช้ข้อมูลส่วนบุคคลของท่าน (คำนำหน้าชื่อ, ชื่อ-นามสกุลภาษาไทยและภาษาอังกฤษ, เบอร์โทรศัพท์ และอีเมล) เพื่อวัตถุประสงค์ในการตรวจสอบสิทธิ์ ดำเนินการจัดทำระบบคิวงาน ออกวุฒิบัตรดิจิทัล (E-Certificate) และส่งมอบข้อมูลคิวอาร์โค้ดผ่านทางอีเมลเพื่อใช้รายงานตัวเข้างานจริงตามฐานสัญญา</p>
             <p><b>⚠️ การบันทึกภาพและวิดีโอ:</b> ในระหว่างการจัดการฝึกอบรมวิชาปฏิบัติการจริง จะมีการบันทึกภาพนิ่ง ภาพเคลื่อนไหว และวิดีโอของผู้เข้ารับการอบรม โดยมีวัตถุประสงค์เพื่อใช้ในการทำสื่อประชาสัมพันธ์ สรุปกิจกรรม สื่อการเรียนการสอน และโฆษณาเผยแพร่ผ่านช่องทางออนไลน์/โซเชียลมีเดียหลักของศูนย์ฝึกโรงพยาบาล</p>
             <p><b>ระยะเวลาการจัดเก็บ:</b> ศูนย์ฝึกจะทำการจัดเก็บข้อมูลทั่วไปของท่านไว้ในระบบปลอดภัยเป็นระยะเวลา 3 ปี เพื่อประโยชน์ในการตรวจสอบสิทธิ์ย้อนหลัง สำหรับภาพถ่ายและวิดีโอเพื่อการประชาสัมพันธ์จะจัดเก็บไว้ตลอดระยะเวลาการดำเนินงานของศูนย์ฝึก เว้นแต่มีการแจ้งเพิกถอนความยินยอม</p>
             <p><b>สิทธิ์ของเจ้าของข้อมูล:</b> ท่านมีสิทธิ์ในการขอเข้าถึง ขอแก้ไข หรือขอให้ลบข้อมูลส่วนบุคคล รวมถึงสามารถแจ้งลบภาพถ่าย/วิดีโอที่มีใบหน้าของท่านออกจากสื่อประชาสัมพันธ์ของศูนย์ฝึกได้ทุกเมื่อ โดยติดต่อเจ้าหน้าที่ควบคุมข้อมูลของระบบ</p>
@@ -159,18 +160,43 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // ⚙️ อัปเดตผูก Environment Variables และลิงก์ Web App API จริงของคุณแล้ว
-    const CONFIG_APP = {
-      SUPABASE_URL: "https://ghgmupyrkeakyolliogv.supabase.co",
-      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoZ211cHlya2Vha3lvbGxpb2d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNDE0ODksImV4cCI6MjA5NDgxNzQ4OX0.RSciT8WVeD9bwmo3DlMhw4KsdM1ftgKXka9QI9pvYzs",
-      GOOGLE_SHEET_API: "https://script.google.com/macros/s/AKfycby1Cfn0lSS6eDfCikdaXViWVUfGlv7EZOWFQzX5KQ7q6e2TsVpBp316dgSes3rvz0yf/exec" 
-    };
+    // ⚙️ ผูกชุดตัวแปรคอนฟิกจริงของ RJRH TRAINING CENTER ตามคำสั่ง
+    const SUPABASE_URL = "https://ghgmupyrkeakyolliogv.supabase.co"; 
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoZ211cHlya2Vha3lvbGxpb2d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNDE0ODksImV4cCI6MjA5NDgxNzQ4OX0.RSciT8WVeD9bwmo3DlMhw4KsdM1ftgKXka9QI9pvYzs"; 
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycby1Cfn0lSS6eDfCikdaXViWVUfGlv7EZOWFQzX5KQ7q6e2TsVpBp316dgSes3rvz0yf/exec"; 
 
-    const supabaseClient = window.supabase.createClient(CONFIG_APP.SUPABASE_URL, CONFIG_APP.SUPABASE_ANON_KEY);
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
     const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
     let loadedSessions = []; 
 
     window.addEventListener('DOMContentLoaded', loadSessions);
+
+    function checkOther(selectObj) {
+      const otherInput = document.getElementById('other_prefix');
+      if (selectObj.value === 'Other') {
+        otherInput.style.display = 'block';
+        otherInput.required = true;
+      } else {
+        otherInput.style.display = 'none';
+        otherInput.required = false;
+        otherInput.value = '';
+      }
+    }
+
+    function getFinalPrefix() {
+      const selectVal = document.getElementById('inp_prefix').value;
+      if (selectVal === 'Other') return document.getElementById('other_prefix').value.trim();
+      return selectVal;
+    }
+
+    function generate8CharID() {
+      const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+      let result = "";
+      for (let i = 0; i < 8; i++) {
+        result += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return result;
+    }
 
     async function loadSessions() {
       const dateSelect = document.getElementById('date');
@@ -189,10 +215,12 @@
             option.disabled = true; 
             statusText = `(Full)`; 
           }
+          
           option.textContent = `📘 [${session.course_key}] ${session.name} - ${session.date} ${statusText}`;
           dateSelect.appendChild(option);
         });
       } catch (error) { 
+        console.error("โหลดข้อมูลรอบอบรมไม่สำเร็จ: ", error); 
         dateSelect.innerHTML = '<option value="">❌ เกิดข้อผิดพลาดขัดข้องในการโหลดข้อมูลอบรม</option>';
       }
     }
@@ -200,17 +228,29 @@
     function showConfirm() {
       const form = document.getElementById('regForm');
       const emailInput = document.getElementById('inp_email');
-      const nameThInput = document.getElementById('inp_name_th');
-      const nameEnInput = document.getElementById('inp_name_en');
+      const nameTHInput = document.getElementById('inp_name_th');
+      const nameENInput = document.getElementById('inp_name_en');
       
       emailInput.value = emailInput.value.trim();
-      nameThInput.value = nameThInput.value.trim();
-      nameEnInput.value = nameEnInput.value.trim().toUpperCase(); 
+      nameTHInput.value = nameTHInput.value.trim();
+      nameENInput.value = nameENInput.value.trim().toUpperCase(); 
       
       if(!form.checkValidity()) { form.reportValidity(); return; }
 
-      const prefix = document.getElementById('inp_prefix').value;
+      const actualPrefix = getFinalPrefix();
       const selectedSession = loadedSessions.find(s => s.id == document.getElementById('date').value);
+
+      let prefixTH = "";
+      if (actualPrefix === "Mr.") prefixTH = "นาย";
+      else if (actualPrefix === "Mrs.") prefixTH = "นาง";
+      else if (actualPrefix === "Ms.") prefixTH = "นางสาว";
+      else if (actualPrefix === "Master") prefixTH = "เด็กชาย";
+      else if (actualPrefix === "Miss") prefixTH = "เด็กหญิง";
+      else if (actualPrefix !== "") prefixTH = actualPrefix; 
+
+      const isStandardTH = ["นาย", "นาง", "นางสาว", "เด็กชาย", "เด็กหญิง"].includes(prefixTH);
+      const displayTH = prefixTH + (prefixTH && !isStandardTH ? " " : "") + nameTHInput.value;
+      const displayEN = actualPrefix ? actualPrefix + " " + nameENInput.value : nameENInput.value;
 
       document.getElementById('chk_required_notice').checked = false;
       document.getElementById('chk_marketing_consent').checked = false;
@@ -218,22 +258,16 @@
 
       document.getElementById('confirmData').innerHTML = `
         <div class="p-3 bg-white border rounded-3 shadow-sm">
-          <p class="mb-2"><span class="confirm-label text-muted small">ชื่อ-นามสกุล (TH):</span> <b class="text-dark">${nameThInput.value}</b></p>
-          <p class="mb-2"><span class="confirm-label text-muted small">Prefix & Name (EN):</span> <b class="text-dark fs-5">${prefix} ${nameEnInput.value}</b></p>
+          <p class="mb-2"><span class="confirm-label text-muted small">Name (TH):</span> <b class="text-dark fs-5">${displayTH}</b></p>
+          <p class="mb-2"><span class="confirm-label text-muted small">Name (EN):</span> <b class="text-dark fs-6">${displayEN}</b></p>
           <p class="mb-2"><span class="confirm-label text-muted small">Phone Number:</span> <b class="text-dark">${document.getElementById('inp_phone').value}</b></p>
           <p class="mb-0"><span class="confirm-label text-muted small">Email Address:</span> <b class="text-dark">${emailInput.value}</b></p>
         </div>
         <div class="p-3 bg-light border text-center fw-bold text-primary rounded-3 fs-6 mt-2">
             📘 Course: ${selectedSession.name}<br>
-            <span class="text-muted small fw-normal">Schedule: ${selectedSession.date}</span>
+            <span class="text-muted small fw-normal">รอบการอบรม: ${selectedSession.date}</span>
         </div>`;
       confirmModal.show();
-    }
-
-    function validateConsentState() {
-      const isRequiredNoticeChecked = document.getElementById('chk_required_notice').checked;
-      const confirmBtn = document.getElementById('confirmBtn');
-      confirmBtn.disabled = !isRequiredNoticeChecked;
     }
 
     async function submitForm() {
@@ -241,9 +275,23 @@
       btn.disabled = true; 
       btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
 
-      const prefix = document.getElementById('inp_prefix').value;
-      const nameTh = document.getElementById('inp_name_th').value;
-      const nameEn = document.getElementById('inp_name_en').value;
+      const actualPrefix = getFinalPrefix();
+      const generatedRegId = generate8CharID(); 
+      
+      let prefixTH = "";
+      if (actualPrefix === "Mr.") prefixTH = "นาย";
+      else if (actualPrefix === "Mrs.") prefixTH = "นาง";
+      else if (actualPrefix === "Ms.") prefixTH = "นางสาว";
+      else if (actualPrefix === "Master") prefixTH = "เด็กชาย";
+      else if (actualPrefix === "Miss") prefixTH = "เด็กหญิง";
+      else if (actualPrefix !== "") prefixTH = actualPrefix;
+
+      const isStandardTH = ["นาย", "นาง", "นางสาว", "เด็กชาย", "เด็กหญิง"].includes(prefixTH);
+      
+      // รวมคำนำหน้าและชื่อเข้าด้วยกันเป็นก้อนแบนเซฟลงคอลัมน์เดี่ยวตามระเบียบใหม่เป๊ะๆ
+      const fullNameTH = prefixTH + (prefixTH && !isStandardTH ? " " : "") + document.getElementById('inp_name_th').value.trim();
+      const fullNameEN = document.getElementById('inp_name_en').value.trim();
+      
       const phone = document.getElementById('inp_phone').value;
       const email = document.getElementById('inp_email').value;
       const sessionId = document.getElementById('date').value;
@@ -254,39 +302,37 @@
         if (checkError) throw checkError;
         if (currentSession.available_seats <= 0) throw new Error("ขออภัยด้วยครับ รอบการอบรมหลักสูตรนี้ที่นั่งเต็มแล้ว");
 
-        // 1. บันทึกลงตารางลูกตามโครงสร้างใหม่
-        const { data: insertedData, error: insertError } = await supabaseClient
+        // 🚀 บันทึกลงตารางเวอร์ชันแบน เรียบง่าย สวยงาม ตรงตามรูปหน้าจอของคุณ
+        const { error: insertError } = await supabaseClient
           .from('registrations')
           .insert([{ 
-            prefix: prefix, 
-            name_th: nameTh,
-            name_en: nameEn, 
+            id: generatedRegId, 
+            prefix: actualPrefix, 
+            full_name_th: fullNameTH, 
+            full_name_en: fullNameEN, 
             phone: phone, 
             email: email, 
-            session_id: parseInt(sessionId),
-            photo_consent: photoConsentValue
-          }])
-          .select('id')
-          .single();
+            course_key: currentSession.course_key, // บันทึกตรงไปที่ฟิลด์คุมความสัมพันธ์สากล
+            photo_consent: photoConsentValue 
+          }]);
           
         if (insertError) throw insertError;
-        const generatedRegId = insertedData.id; 
 
-        // 2. ตัดที่นั่งตารางหลัก
+        // หักที่นั่งบนตารางแม่
         await supabaseClient.from('sessions').update({ available_seats: currentSession.available_seats - 1 }).eq('id', sessionId);
 
         const fullSessionString = `${currentSession.name} (${currentSession.date})`;
         
-        // 3. ยิงไปทำงาน Automation ฝั่ง Google Apps Script
-        await fetch(CONFIG_APP.GOOGLE_SHEET_API, {
+        // 🚀 ส่งต่อหาคู่ตัวแปรฝั่ง .gs ดั้งเดิมในแถว 13 คอลัมน์แบบรวดเร็ว
+        fetch(GOOGLE_SHEET_API, {
           method: "POST",
           mode: "no-cors",
           body: new URLSearchParams({ 
             "action": "registerOnline", 
             "id": generatedRegId, 
-            "prefix": prefix, 
-            "nameTh": nameTh,
-            "nameEn": nameEn, 
+            "prefix": actualPrefix, 
+            "fullNameTH": fullNameTH,
+            "fullNameEN": fullNameEN,
             "phone": phone, 
             "email": email, 
             "sessionName": fullSessionString,
@@ -298,11 +344,15 @@
         document.getElementById('displayResId').innerText = generatedRegId;
         document.getElementById('successOverlay').style.display = 'flex';
         document.getElementById('regForm').reset();
+        
+        document.getElementById('other_prefix').style.display = 'none';
+        document.getElementById('other_prefix').required = false;
+
       } catch (err) { 
         alert("ระบบขัดข้อง: " + err.message); 
         btn.disabled = false; 
         btn.innerHTML = '<i class="fas fa-check-circle me-1"></i> Confirm & Register';
-        validateConsentState();
+        validateConsentState(); 
       }
     }
   </script>
