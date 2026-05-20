@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Online Registration - RJRH TRAINING CENTER</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root { --primary-color: #0b4c8c; --card-bg: rgba(255, 255, 255, 0.96); }
+    * { box-sizing: border-box; font-family: 'Sarabun', sans-serif !important; }
+    body { min-height: 100vh; background: linear-gradient(135deg, #f0f6fc 0%, #e1eefc 100%); color: #1f2937; }
+    .page-shell { width: 100%; min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .form-container { width: min(100%, 760px); background: var(--card-bg); padding: 40px; border-radius: 28px; box-shadow: 0 28px 80px rgba(11,76,140,0.12); position: relative; overflow: hidden; }
+    .form-container::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 9px; background: linear-gradient(90deg, #0b4c8c, #22c55e); }
+    .header { text-align: center; margin-bottom: 30px; }
+    .header img { max-width: 260px; height: auto; }
+    #successOverlay { display: none; position: absolute; inset: 0; background: rgba(255, 255, 255, 0.99); z-index: 100; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 36px; }
+    .form-label { font-weight: 700; color: #233044; }
+    .form-control, .form-select { min-height: 50px; border-radius: 14px; border: 1px solid #d7e2f2; }
+    .btn-submit { background: linear-gradient(135deg, #0b4c8c, #06315c); border: none; padding: 15px; border-radius: 999px; width: 100%; color: white; font-weight: 800; transition: 0.2s; }
+    .btn-submit:hover { opacity: 0.9; transform: translateY(-1px); }
+    .confirm-label { font-weight: 800; color: #52637a; width: 160px; display: inline-block; }
+  </style>
+</head>
+<body>
+
+  <main class="page-shell">
+    <div class="form-container">
+      
+      <!-- หน้าจอเมื่อทำรายการสำเร็จอัตโนมัติ -->
+      <div id="successOverlay">
+        <div style="font-size: 80px;" class="mb-2">✅</div>
+        <h2 class="text-success fw-bold mb-1">ลงทะเบียนสำเร็จ!</h2>
+        <p class="text-muted">โปรดแคปหน้าจอเก็บรหัสลงทะเบียนนี้ไว้แสดงต่อเจ้าหน้าที่หน้างาน</p>
+        <div class="p-4 bg-light rounded-4 w-100 mb-4 border text-center shadow-sm" style="max-width: 450px;">
+          <span id="displayResId" class="text-primary fw-bold fs-1" style="letter-spacing: 2px;"></span>
+        </div>
+        <div class="alert alert-info py-2 px-4 rounded-pill small mb-4">📧 ระบบได้จัดส่ง QR Code ยืนยันเข้าสู่อีเมลของท่านแล้ว</div>
+        <button class="btn btn-outline-secondary rounded-pill px-5 fw-bold" onclick="location.reload()">ลงทะเบียนคนถัดไป</button>
+      </div>
+
+      <div class="header">
+        <!-- อัปเดตโลโก้ศูนย์ฝึกอบรม RJRH ชุดใหม่หลักสากล -->
+        <img src="https://ghgmupyrkeakyolliogv.supabase.co/storage/v1/object/public/rjrh-trainning's%20Org/rjrh-traiing.png" alt="RJRH TRAINING CENTER LOGO">
+        <h4 class="mt-3 fw-bold text-primary">RJRH TRAINING CENTER</h4>
+        <h5 class="fw-bold text-secondary fs-6">ระบบลงทะเบียนเข้ารับการฝึกอบรมออนไลน์</h5>
+        <p class="text-muted small">กรุณากรอกข้อมูลส่วนบุคคลให้ครบถ้วนเพื่อใช้ในการตรวจสอบสิทธิ์และออกวุฒิบัตร</p>
+      </div>
+
+      <form id="regForm" onkeydown="return event.key != 'Enter';">
+        <div class="row">
+          <div class="col-md-12 mb-3">
+            <label class="form-label">Prefix (คำนำหน้าชื่อสากล)</label>
+            <select class="form-select" id="inp_prefix" required>
+              <option value="">Select Prefix...</option>
+              <option value="Mr.">Mr. (นาย)</option>
+              <option value="Mrs.">Mrs. (นาง)</option>
+              <option value="Ms.">Ms. (นางสาว)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">ชื่อ - นามสกุล (ภาษาไทยตามบัตรประชาชน)</label>
+          <input type="text" class="form-control" id="inp_name_th" required placeholder="สมชาย รักดี" pattern="^[ก-๙เแโใไาำะัิีึืุู֥็่้๊๋์\s]+$">
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Full Name (ภาษาอังกฤษ ตัวพิมพ์ใหญ่เพื่อพิมพ์ใบประกาศสากล)</label>
+          <input type="text" class="form-control" id="inp_name_en" required placeholder="SOMCHAI RAKDEE" pattern="^[A-Za-z\s]+$" oninput="this.value = this.value.toUpperCase()">
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Phone Number (เบอร์โทรศัพท์ติดต่อ)</label>
+          <input type="tel" class="form-control" id="inp_phone" required placeholder="08XXXXXXXX" pattern="[0-9]{9,10}">
+        </div>
+        
+        <div class="mb-3">
+          <label class="form-label">Email Address <span class="text-danger small">(แนะนำให้ใช้ @gmail.com)</span></label>
+          <input type="email" class="form-control" id="inp_email" required placeholder="example@gmail.com">
+        </div>
+        
+        <div class="mb-4">
+          <label class="form-label">Course & Training Session (หลักสูตรและรอบจัดอบรม)</label>
+          <select class="form-select" id="date" required>
+            <option value="">กำลังโหลดรายการหลักสูตรจากศูนย์การเรียนรู้...</option>
+          </select>
+        </div>
+        
+        <div class="border rounded-14 p-3 mb-4" style="background-color: #f0f7ff; border: 1px solid #bce0ff;">
+          <p class="margin: 0; font-size: 14px; color: #0b4c8c; line-height: 1.5; margin: 0;">
+            <i class="fas fa-info-circle me-1"></i> <b>💡 ข้อแนะนำการเข้าร่วมฝึกอบรม:</b> กรุณาแต่งกายสุภาพ พร้อมฝึกปฏิบัติการ และเดินทางมาถึงก่อนเวลาเริ่มงานอย่างน้อย 15 นาที
+          </p>
+        </div>
+        
+        <button type="button" class="btn btn-submit shadow-sm fs-5" onclick="showConfirm()">Register Now</button>
+      </form>
+    </div>
+  </main>
+
+  <!-- Modal ตรวจสอบข้อมูล ควบคู่การยินยอม PDPA & Privacy Notice -->
+  <div class="modal fade" id="confirmModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+      <div class="modal-content" style="border-radius: 20px; overflow: hidden; border: none; box-shadow: 0 20px 50px rgba(0,0,0,0.15);">
+        <div class="modal-header bg-primary text-white py-3">
+          <h5 class="modal-title fw-bold"><i class="fas fa-file-signature me-2"></i>Review Information & Privacy Consent</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        
+        <div class="modal-body p-4" style="max-height: 70vh; overflow-y: auto;">
+          <h6 class="fw-bold text-primary mb-3"><i class="fas fa-user me-1"></i> 1. ตรวจสอบข้อมูลการสมัครของท่าน</h6>
+          <div id="confirmData" class="mb-4"></div>
+          
+          <hr class="my-4">
+
+          <h6 class="fw-bold text-primary mb-2"><i class="fas fa-shield-alt me-1"></i> 2. นโยบายคุ้มครองข้อมูลส่วนบุคคล (Privacy Notice)</h6>
+          <div class="p-3 bg-light rounded-3 mb-3 small text-muted border" style="max-height: 180px; overflow-y: auto; line-height: 1.6;">
+            <p class="fw-bold text-dark mb-1">ศูนย์ฝึกอบรม RJRH TRAINING CENTER ขอแจ้งรายละเอียดการประมวลผลข้อมูลส่วนบุคคลให้ท่านทราบดังนี้:</p>
+            <p><b>วัตถุประสงค์การจัดเก็บ:</b> เรามีความจำเป็นต้องจัดเก็บและใช้ข้อมูลส่วนบุคคลของท่าน เพื่อวัตถุประสงค์ในการตรวจสอบสิทธิ์ ดำเนินการจัดทำระบบคิวงาน ออกวุฒิบัตรดิจิทัล (E-Certificate) และส่งมอบข้อมูลคิวอาร์โค้ดผ่านทางอีเมลเพื่อใช้รายงานตัวเข้างานจริงตามฐานสัญญา</p>
+            <p><b>⚠️ การบันทึกภาพและวิดีโอ:</b> ในระหว่างการจัดการฝึกอบรมวิชาปฏิบัติการจริง จะมีการบันทึกภาพนิ่ง ภาพเคลื่อนไหว และวิดีโอของผู้เข้ารับการอบรม โดยมีวัตถุประสงค์เพื่อใช้ในการทำสื่อประชาสัมพันธ์ สรุปกิจกรรม สื่อการเรียนการสอน และโฆษณาเผยแพร่ผ่านช่องทางออนไลน์/โซเชียลมีเดียหลักของศูนย์ฝึกโรงพยาบาล</p>
+            <p><b>ระยะเวลาการจัดเก็บ:</b> ศูนย์ฝึกจะทำการจัดเก็บข้อมูลทั่วไปของท่านไว้ในระบบปลอดภัยเป็นระยะเวลา 3 ปี เพื่อประโยชน์ในการตรวจสอบสิทธิ์ย้อนหลัง สำหรับภาพถ่ายและวิดีโอเพื่อการประชาสัมพันธ์จะจัดเก็บไว้ตลอดระยะเวลาการดำเนินงานของศูนย์ฝึก เว้นแต่มีการแจ้งเพิกถอนความยินยอม</p>
+            <p><b>สิทธิ์ของเจ้าของข้อมูล:</b> ท่านมีสิทธิ์ในการขอเข้าถึง ขอแก้ไข หรือขอให้ลบข้อมูลส่วนบุคคล รวมถึงสามารถแจ้งลบภาพถ่าย/วิดีโอที่มีใบหน้าของท่านออกจากสื่อประชาสัมพันธ์ของศูนย์ฝึกได้ทุกเมื่อ โดยติดต่อเจ้าหน้าที่ควบคุมข้อมูลของระบบ</p>
+          </div>
+
+          <div class="p-3 rounded-3" style="background-color: #f8fafc; border: 1px solid #e2e8f0;">
+            <div class="form-check mb-3">
+              <input class="form-check-input" type="checkbox" id="chk_marketing_consent">
+              <label class="form-check-label small fw-bold text-primary" for="chk_marketing_consent" style="cursor: pointer;">
+                (ยินยอม) ฉันให้ความยินยอมแก่ RJRH TRAINING CENTER ในการบันทึกภาพถ่าย ภาพเคลื่อนไหว และวิดีโอของฉันในระหว่างรับการฝึกอบรม เพื่อนำไปใช้ในการประชาสัมพันธ์และเผยแพร่ผ่านสื่อต่างๆ ของศูนย์ฝึก
+              </label>
+              <div class="form-text text-muted mt-1" style="font-size: 11px; padding-left: 24px;">
+                *ท่านสามารถเลือกไม่ยินยอมในช่องนี้ได้ โดยไม่มีผลกระทบต่อสิทธิ์ในการเข้ารับรายงานตัวฝึกอบรมหรือการรับวุฒิบัตรใดๆ ทั้งสิ้น
+              </div>
+            </div>
+
+            <hr class="my-2" style="border-top: 1px dashed #cbd5e1;">
+
+            <div class="form-check mt-3">
+              <input class="form-check-input" type="checkbox" id="chk_required_notice" onchange="validateConsentState()">
+              <label class="form-check-label small fw-bold text-dark" for="chk_required_notice" style="cursor: pointer;">
+                <span class="text-danger">*</span> ฉันได้อ่านและรับทราบนโยบายความเป็นส่วนตัวข้างต้น และ "ยินยอม" ให้ศูนย์ฝึกประมวลผลข้อมูลส่วนบุคคลเพื่อการออกใบประกาศและการจัดการอบรม (จำเป็นต้องเลือกเพื่อรับสิทธิ์เข้าเรียน)
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer bg-light border-top-0 py-3">
+          <button type="button" class="btn btn-link text-muted text-decoration-none fw-bold" data-bs-dismiss="modal">Go Back & Edit</button>
+          <button type="button" class="btn btn-primary px-4 rounded-pill fw-bold" id="confirmBtn" onclick="submitForm()" disabled>
+            <i class="fas fa-check-circle me-1"></i> Confirm & Register
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script>
+    const CONFIG_APP = {
+      SUPABASE_URL: "https://ghgmupyrkeakyolliogv.supabase.co",
+      SUPABASE_ANON_KEY: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmasZSIsInJlZiI6ImdoZ211cHlya2Vha3lvbGxpb2d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNDE0ODksImV4cCI6MjA5NDQxNzQ4OX0.RSciT8WVeD9bwmo3DlMhw4KsdM1ftgKXka9QI9pvYzs",
+      GOOGLE_SHEET_API: "https://script.google.com/macros/s/AKfycbyX4O0PyxIkRy24iIotJn7atpAJznN7CvPAkUASoSbb9Uv7eFT_sVllTMs_SMcFlbmT/exec" 
+    };
+
+    const supabaseClient = window.supabase.createClient(CONFIG_APP.SUPABASE_URL, CONFIG_APP.SUPABASE_ANON_KEY);
+    const confirmModal = new bootstrap.Modal(document.getElementById('confirmModal'));
+    let loadedSessions = []; 
+
+    window.addEventListener('DOMContentLoaded', loadSessions);
+
+    async function loadSessions() {
+      const dateSelect = document.getElementById('date');
+      try {
+        const { data: sessions, error } = await supabaseClient.from('sessions').select('*').eq('status', 'Active').order('id', { ascending: true });
+        if (error) throw error;
+        
+        loadedSessions = sessions;
+        dateSelect.innerHTML = '<option value="">-- Select Course & Session --</option>';
+        
+        sessions.forEach(session => {
+          const option = document.createElement('option');
+          option.value = session.id; 
+          let statusText = `(Available ${session.available_seats}/${session.max_seats} seats)`;
+          if (session.available_seats <= 0) { 
+            option.disabled = true; 
+            statusText = `(Full)`; 
+          }
+          option.textContent = `📘 [${session.course_key}] ${session.name} - ${session.date} ${statusText}`;
+          dateSelect.appendChild(option);
+        });
+      } catch (error) { 
+        dateSelect.innerHTML = '<option value="">❌ เกิดข้อผิดพลาดขัดข้องในการโหลดข้อมูลอบรม</option>';
+      }
+    }
+
+    function showConfirm() {
+      const form = document.getElementById('regForm');
+      const emailInput = document.getElementById('inp_email');
+      const nameThInput = document.getElementById('inp_name_th');
+      const nameEnInput = document.getElementById('inp_name_en');
+      
+      emailInput.value = emailInput.value.trim();
+      nameThInput.value = nameThInput.value.trim();
+      nameEnInput.value = nameEnInput.value.trim().toUpperCase(); 
+      
+      if(!form.checkValidity()) { form.reportValidity(); return; }
+
+      const prefix = document.getElementById('inp_prefix').value;
+      const selectedSession = loadedSessions.find(s => s.id == document.getElementById('date').value);
+
+      document.getElementById('chk_required_notice').checked = false;
+      document.getElementById('chk_marketing_consent').checked = false;
+      document.getElementById('confirmBtn').disabled = true;
+
+      document.getElementById('confirmData').innerHTML = `
+        <div class="p-3 bg-white border rounded-3 shadow-sm">
+          <p class="mb-2"><span class="confirm-label text-muted small">ชื่อ-นามสกุล (TH):</span> <b class="text-dark">${nameThInput.value}</b></p>
+          <p class="mb-2"><span class="confirm-label text-muted small">Prefix & Name (EN):</span> <b class="text-dark fs-5">${prefix} ${nameEnInput.value}</b></p>
+          <p class="mb-2"><span class="confirm-label text-muted small">Phone Number:</span> <b class="text-dark">${document.getElementById('inp_phone').value}</b></p>
+          <p class="mb-0"><span class="confirm-label text-muted small">Email Address:</span> <b class="text-dark">${emailInput.value}</b></p>
+        </div>
+        <div class="p-3 bg-light border text-center fw-bold text-primary rounded-3 fs-6 mt-2">
+            📘 Course: ${selectedSession.name}<br>
+            <span class="text-muted small fw-normal">Schedule: ${selectedSession.date}</span>
+        </div>`;
+      confirmModal.show();
+    }
+
+    function validateConsentState() {
+      const isRequiredNoticeChecked = document.getElementById('chk_required_notice').checked;
+      const confirmBtn = document.getElementById('confirmBtn');
+      confirmBtn.disabled = !isRequiredNoticeChecked;
+    }
+
+    async function submitForm() {
+      const btn = document.getElementById('confirmBtn');
+      btn.disabled = true; 
+      btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing...';
+
+      const prefix = document.getElementById('inp_prefix').value;
+      const nameTh = document.getElementById('inp_name_th').value;
+      const nameEn = document.getElementById('inp_name_en').value;
+      const phone = document.getElementById('inp_phone').value;
+      const email = document.getElementById('inp_email').value;
+      const sessionId = document.getElementById('date').value;
+      const photoConsentValue = document.getElementById('chk_marketing_consent').checked;
+
+      try {
+        const { data: currentSession, error: checkError } = await supabaseClient.from('sessions').select('available_seats, name, date, course_key').eq('id', sessionId).single();
+        if (checkError) throw checkError;
+        if (currentSession.available_seats <= 0) throw new Error("ขออภัยด้วยครับ รอบการอบรมหลักสูตรนี้ที่นั่งเต็มแล้ว");
+
+        const { data: insertedData, error: insertError } = await supabaseClient
+          .from('registrations')
+          .insert([{ 
+            prefix: prefix, 
+            name_th: nameTh,
+            name_en: nameEn, 
+            phone: phone, 
+            email: email, 
+            session_id: parseInt(sessionId),
+            photo_consent: photoConsentValue
+          }])
+          .select('id')
+          .single();
+          
+        if (insertError) throw insertError;
+        const generatedRegId = insertedData.id; 
+
+        await supabaseClient.from('sessions').update({ available_seats: currentSession.available_seats - 1 }).eq('id', sessionId);
+
+        const fullSessionString = `${currentSession.name} (${currentSession.date})`;
+        
+        fetch(CONFIG_APP.GOOGLE_SHEET_API, {
+          method: "POST",
+          mode: "no-cors",
+          body: new URLSearchParams({ 
+            "action": "registerOnline", 
+            "id": generatedRegId, 
+            "prefix": prefix, 
+            "nameTh": nameTh,
+            "nameEn": nameEn, 
+            "phone": phone, 
+            "email": email, 
+            "sessionName": fullSessionString,
+            "courseKey": currentSession.course_key 
+          })
+        });
+
+        confirmModal.hide();
+        document.getElementById('displayResId').innerText = generatedRegId;
+        document.getElementById('successOverlay').style.display = 'flex';
+        document.getElementById('regForm').reset();
+      } catch (err) { 
+        alert("ระบบขัดข้อง: " + err.message); 
+        btn.disabled = false; 
+        validateConsentState();
+      }
+    }
+  </script>
+</body>
+</html>
