@@ -160,7 +160,6 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <script>
-    // ⚙️ ผูกชุดตัวแปรคอนฟิกจริงของ RJRH TRAINING CENTER ตามคำสั่ง
     const SUPABASE_URL = "https://ghgmupyrkeakyolliogv.supabase.co"; 
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdoZ211cHlya2Vha3lvbGxpb2d2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzkyNDE0ODksImV4cCI6MjA5NDgxNzQ4OX0.RSciT8WVeD9bwmo3DlMhw4KsdM1ftgKXka9QI9pvYzs"; 
     const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycby1Cfn0lSS6eDfCikdaXViWVUfGlv7EZOWFQzX5KQ7q6e2TsVpBp316dgSes3rvz0yf/exec"; 
@@ -270,6 +269,13 @@
       confirmModal.show();
     }
 
+    // 🔥 เติมฟังก์ชันที่หายไปให้แล้วครับ
+    function validateConsentState() {
+      const isRequiredNoticeChecked = document.getElementById('chk_required_notice').checked;
+      const confirmBtn = document.getElementById('confirmBtn');
+      confirmBtn.disabled = !isRequiredNoticeChecked;
+    }
+
     async function submitForm() {
       const btn = document.getElementById('confirmBtn');
       btn.disabled = true; 
@@ -288,7 +294,6 @@
 
       const isStandardTH = ["นาย", "นาง", "นางสาว", "เด็กชาย", "เด็กหญิง"].includes(prefixTH);
       
-      // รวมคำนำหน้าและชื่อเข้าด้วยกันเป็นก้อนแบนเซฟลงคอลัมน์เดี่ยวตามระเบียบใหม่เป๊ะๆ
       const fullNameTH = prefixTH + (prefixTH && !isStandardTH ? " " : "") + document.getElementById('inp_name_th').value.trim();
       const fullNameEN = document.getElementById('inp_name_en').value.trim();
       
@@ -302,7 +307,6 @@
         if (checkError) throw checkError;
         if (currentSession.available_seats <= 0) throw new Error("ขออภัยด้วยครับ รอบการอบรมหลักสูตรนี้ที่นั่งเต็มแล้ว");
 
-        // 🚀 บันทึกลงตารางเวอร์ชันแบน เรียบง่าย สวยงาม ตรงตามรูปหน้าจอของคุณ
         const { error: insertError } = await supabaseClient
           .from('registrations')
           .insert([{ 
@@ -312,18 +316,16 @@
             full_name_en: fullNameEN, 
             phone: phone, 
             email: email, 
-            course_key: currentSession.course_key, // บันทึกตรงไปที่ฟิลด์คุมความสัมพันธ์สากล
+            course_key: currentSession.course_key, 
             photo_consent: photoConsentValue 
           }]);
           
         if (insertError) throw insertError;
 
-        // หักที่นั่งบนตารางแม่
         await supabaseClient.from('sessions').update({ available_seats: currentSession.available_seats - 1 }).eq('id', sessionId);
 
         const fullSessionString = `${currentSession.name} (${currentSession.date})`;
         
-        // 🚀 ส่งต่อหาคู่ตัวแปรฝั่ง .gs ดั้งเดิมในแถว 13 คอลัมน์แบบรวดเร็ว
         fetch(GOOGLE_SHEET_API, {
           method: "POST",
           mode: "no-cors",
