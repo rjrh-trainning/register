@@ -269,7 +269,6 @@
       confirmModal.show();
     }
 
-    // 🔥 เติมฟังก์ชันที่หายไปให้แล้วครับ
     function validateConsentState() {
       const isRequiredNoticeChecked = document.getElementById('chk_required_notice').checked;
       const confirmBtn = document.getElementById('confirmBtn');
@@ -307,6 +306,7 @@
         if (checkError) throw checkError;
         if (currentSession.available_seats <= 0) throw new Error("ขออภัยด้วยครับ รอบการอบรมหลักสูตรนี้ที่นั่งเต็มแล้ว");
 
+        // 🌟 แก้ไขสำเร็จ: นำค่าตัวแปร sessionId ที่เลือกโยนฝังเข้าคอลัมน์ session_id ตรงๆ ตั้งแต่สมัครรอบใหม่
         const { error: insertError } = await supabaseClient
           .from('registrations')
           .insert([{ 
@@ -317,6 +317,7 @@
             phone: phone, 
             email: email, 
             course_key: currentSession.course_key, 
+            session_id: Number(sessionId), // 📌 [จุดเพิ่มเติมความสมบูรณ์แบบ] สแตมป์ผูกมัดเลขไอดีรอบ
             photo_consent: photoConsentValue 
           }]);
           
