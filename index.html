@@ -306,7 +306,7 @@
         if (checkError) throw checkError;
         if (currentSession.available_seats <= 0) throw new Error("ขออภัยด้วยครับ รอบการอบรมหลักสูตรนี้ที่นั่งเต็มแล้ว");
 
-        // 🌟 แก้ไขสำเร็จ: นำค่าตัวแปร sessionId ที่เลือกโยนฝังเข้าคอลัมน์ session_id ตรงๆ ตั้งแต่สมัครรอบใหม่
+        // บันทึกลง Supabase ตาราง registrations ก่อน
         const { error: insertError } = await supabaseClient
           .from('registrations')
           .insert([{ 
@@ -317,7 +317,7 @@
             phone: phone, 
             email: email, 
             course_key: currentSession.course_key, 
-            session_id: Number(sessionId), // 📌 [จุดเพิ่มเติมความสมบูรณ์แบบ] สแตมป์ผูกมัดเลขไอดีรอบ
+            session_id: Number(sessionId), 
             photo_consent: photoConsentValue 
           }]);
           
@@ -327,6 +327,7 @@
 
         const fullSessionString = `${currentSession.name} (${currentSession.date})`;
         
+        // 🌟 แก้ไข: ส่งข้อมูล sessionId และ photoConsent ไปให้ Google Apps Script ด้วยเสถียรภาพสูงสุด
         fetch(GOOGLE_SHEET_API, {
           method: "POST",
           mode: "no-cors",
@@ -339,7 +340,9 @@
             "phone": phone, 
             "email": email, 
             "sessionName": fullSessionString,
-            "courseKey": currentSession.course_key 
+            "courseKey": currentSession.course_key,
+            "sessionId": sessionId,
+            "photoConsent": photoConsentValue
           })
         });
 
